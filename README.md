@@ -21,3 +21,8 @@ This repo contains R code for the paper of the same name. Specifcally this inclu
     5. Extract_simCoxLMM_estimates.R - this file extracts the Cox model and linear mixed model estimates from these sub-models reported in the supplementary data of the paper.
 
 
+### Note if you plan to run the simulation
+
+The simulation as run for the paper includes 1000 generated datasets for each of 5 different data generating scenarios. In addition, to each dataset 6 different joint models were fit. This was carried out on an 8core Macbook pro with 64GB RAM and required several weeks to perform. If you wish to run the simulation yourself for test purposes and do not have similar hardward available, we recommend that you edit the value of M (the number of simulated datasets for each data generating scenario) in the Gen_sim_data.R from 1000 to a lower number such as 50 for an initial run through of the code. In addition, the number of workers in the line of code 'plan(multisession, workers = 12, gc=TRUE)' determines the number of virtual cpu cores to use and we recommend you set this to a size suited for your computer. Note that at M = 1000, each worker needs at least 4GB of available RAM, although this RAM requirement is lower if you have descreased the value of M.
+
+
