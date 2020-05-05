@@ -9,7 +9,7 @@ Authors: James Rooney<sup>1,2</sup>, Mark Heverin<sup>2</sup>, Orla Hardiman<sup
 4. Centre for Biostatistics, University of Manchester, Manchester, UK
 </sup>
 
-This repo contains R code for the paper of the same name. Specifcally this includes the following:
+This repo contains R code for the paper of the same name. Specifically this includes the following:
 
 1. Rmarkdown file ALS_cohort_analysis.Rmd which performs the cohort analysis from the paper and the ALS_cohort_analysis.pdf which details the results of the analysis.
 
