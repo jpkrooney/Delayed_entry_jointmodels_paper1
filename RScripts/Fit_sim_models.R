@@ -551,48 +551,6 @@ gc()
 
 
 
-##### Build LME models with 2nd degree polynomials for non-linear JMs
-poly_lme_time <- future_lapply(1:M, function(x)
-    lme(Y ~ poly(time, 2),
-            random=~ time | ID,
-            data = datasets5[[x]]$L_data,
-            control = lmeControl(opt = "optim")),
-    future.seed = 34534)
-
-poly_lme_adjtime <- future_lapply(1:M, function(x)
-   lme(Y ~ poly(adj_time, 2),
-       random = ~ adj_time | ID,
-       data = datasets5[[x]]$L_data,
-       control = lmeControl(opt = "optim")),
-   future.seed = 7294575)
-
-saveRDS(poly_lme_time, "Results/Sim_sub-models/poly_lme_time.RDS")
-saveRDS(poly_lme_adjtime, "Results/Sim_sub-models/poly_lme_adjtime.RDS")
-
-
-# Build joint models for scenario 5 model E all datasets
-JM_Scen5_modE <- future_lapply(1:M, function(x)
-    jointModelBayes(poly_lme_time[[x]], coxScen5_modB[[x]], timeVar = "time",
-                    control = list(n.iter = 10000, keepRE = FALSE)),
-    future.seed = 1920485)
-# Save this batch
-saveRDS(JM_Scen5_modE, "Results/Sim_Jms/JM_Scen5_modE.RDS")
-# Clean-up to free up RAM
-rm(JM_Scen5_modE)
-gc()
-
-# Build joint models for scenario 5 model F all datasets
-JM_Scen5_modF <- future_lapply(1:M, function(x)
-    jointModelBayes(poly_lme_adjtime[[x]], coxScen5_modD[[x]], timeVar = "adj_time",
-                    control = list(n.iter = 10000, keepRE = FALSE)),
-    future.seed = 1920485)
-# Save this batch
-saveRDS(JM_Scen5_modF, "Results/Sim_Jms/JM_Scen5_modF.RDS")
-# Clean-up to free up RAM
-rm(JM_Scen5_modF)
-gc()
-
-
 
 # Close down open multisession workers
 plan(sequential)

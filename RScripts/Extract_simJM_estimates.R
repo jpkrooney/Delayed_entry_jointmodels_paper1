@@ -34,17 +34,18 @@ extract_sim_estimates <- function(JMlist, scenario, startM=1, model ){
 # Load dataset 1
 datasets1 <- readRDS("Data/sim_data1.RDS")
 
-# Plot raw survival curves of each dataset in dataset1
-sfits <- list()
-sfits <- lapply(1:length(datasets1), function(x)
-                data.frame(M = x, 
-                fortify( survfit (Surv (surv_t, vital_st) ~ group, data = datasets1[[x]]$S_data) ) ) )
-sfits <- do.call("rbind", sfits)
-sfits$M <- factor(sfits$M)
-
-ggplot(sfits, aes(x = time, y = surv, group = M, col = strata)) +
-    theme(panel.grid=element_blank()) +
-    geom_point(size=0.1, alpha=0.5)
+# Optional code to visualise survival curves from all data in a given scenario
+# Plot raw survival curves of each dataset in dataset1 - can adapt to other datasets
+#sfits <- list()
+#sfits <- lapply(1:length(datasets1), function(x)
+#                data.frame(M = x, 
+#                fortify( survfit (Surv (surv_t, vital_st) ~ group, data = datasets1[[x]]$S_data) ) ) )
+#sfits <- do.call("rbind", sfits)
+#sfits$M <- factor(sfits$M)
+#
+#ggplot(sfits, aes(x = time, y = surv, group = M, col = strata)) +
+#    theme(panel.grid=element_blank()) +
+#    geom_point(size=0.1, alpha=0.5)
     
 
 ###### Extract estimates
@@ -138,15 +139,6 @@ JM_Scen5_modD <- readRDS("Results/Sim_Jms/JM_Scen5_modD.RDS")
 scenario5_ests_d <- extract_sim_estimates(JM_Scen5_modD, scenario = 5, model = "D", startM = 1)
 rm(JM_Scen5_modD)
 gc()
-JM_Scen5_modE <- readRDS("Results/Sim_Jms/JM_Scen5_modE.RDS")
-scenario5_ests_e <- extract_sim_estimates(JM_Scen5_modE, scenario = 5, model = "E", startM = 1)
-rm(JM_Scen5_modE)
-gc()
-JM_Scen5_modF <- readRDS("Results/Sim_Jms/JM_Scen5_modF.RDS")
-scenario5_ests_f <- extract_sim_estimates(JM_Scen5_modF, scenario = 5, model = "F", startM = 1)
-rm(JM_Scen5_modF)
-gc()
-
 
 
 
@@ -156,8 +148,7 @@ scenario1_ests <- rbind(scenario1_ests_a, scenario1_ests_b, scenario1_ests_c, sc
 scenario2_ests <- rbind(scenario2_ests_a, scenario2_ests_b, scenario2_ests_c, scenario2_ests_d)
 scenario3_ests <- rbind(scenario3_ests_a, scenario3_ests_b, scenario3_ests_c, scenario3_ests_d)
 scenario4_ests <- rbind(scenario4_ests_a, scenario4_ests_b, scenario4_ests_c, scenario4_ests_d)
-scenario5_ests <- rbind(scenario5_ests_a, scenario5_ests_b, scenario5_ests_c, scenario5_ests_d,
-                        scenario5_ests_e, scenario5_ests_f)
+scenario5_ests <- rbind(scenario5_ests_a, scenario5_ests_b, scenario5_ests_c, scenario5_ests_d)
 
 
 #
@@ -198,35 +189,58 @@ df1$X97.5. <- as.numeric(df1$X97.5.)
 
 
 # For all scenarios, true values for the intercepts on the adjusted timeline (i.e. t_adj = 0 at time of diagnosis) can be calculated from the individualised b0, b1 and delayed entry times.
+
 datasets1 <- readRDS("Data/sim_data1.RDS")
-scen1_mean_int <- mean( unlist( lapply(1: length(datasets1), function(x)
-    datasets1[[x]]$L_data$B0 + ( datasets1[[x]]$L_data$B1 * datasets1[[x]]$L_data$entry_t  ) ) ) )
+obs_ints_scen1 <- unlist( lapply(1: length(datasets1), function(x)
+    datasets1[[x]]$L_data$B0 + ( datasets1[[x]]$L_data$B1 * datasets1[[x]]$L_data$entry_t  ) ) )
+trunc_ints_scen1 <- unlist( lapply(1: length(datasets1), function(x)
+    datasets1[[x]]$trunc_Ldata$B0 + ( datasets1[[x]]$trunc_Ldata$B1 * datasets1[[x]]$trunc_Ldata$entry_t
+    )))
+scen1_mean_int <- mean( c(obs_ints_scen1, trunc_ints_scen1) )
 rm(datasets1)
 #
 datasets2 <- readRDS("Data/sim_data2.RDS")
-scen2_mean_int <- mean( unlist( lapply(1: length(datasets2), function(x)
-    datasets2[[x]]$L_data$B0 + ( datasets2[[x]]$L_data$B1 * datasets2[[x]]$L_data$entry_t  ) ) ) )
+obs_ints_scen2 <- unlist( lapply(1: length(datasets2), function(x)
+    datasets2[[x]]$L_data$B0 + ( datasets2[[x]]$L_data$B1 * datasets2[[x]]$L_data$entry_t  ) ) )
+trunc_ints_scen2 <- unlist( lapply(1: length(datasets2), function(x)
+    datasets2[[x]]$trunc_Ldata$B0 + ( datasets2[[x]]$trunc_Ldata$B1 * datasets2[[x]]$trunc_Ldata$entry_t
+    )))
+scen2_mean_int <- mean( c(obs_ints_scen2, trunc_ints_scen2) )
 rm(datasets2)
-#
+
+# Note for dataset 3 must also calculate mean slope
 datasets3 <- readRDS("Data/sim_data3.RDS")
-scen3_mean_int <- mean( unlist( lapply(1: length(datasets3), function(x)
-    datasets3[[x]]$L_data$B0 + ( datasets3[[x]]$L_data$B1 * datasets3[[x]]$L_data$entry_t  ) ) ) )
-# Note for dataset 4 there is also ane effect of entry_t on Y ltrunc_long_beta = 0.1 * dx_delay
+obs_ints_scen3 <- unlist( lapply(1: length(datasets3), function(x)
+    datasets3[[x]]$L_data$B0 + ( datasets3[[x]]$L_data$B1 * datasets3[[x]]$L_data$entry_t  ) ) )
+trunc_ints_scen3 <- unlist( lapply(1: length(datasets3), function(x)
+    datasets3[[x]]$trunc_Ldata$B0 + ( datasets3[[x]]$trunc_Ldata$B1 * datasets3[[x]]$trunc_Ldata$entry_t
+    )))
+scen3_mean_int <- mean( c(obs_ints_scen3, trunc_ints_scen3) )
+#
+obs_slope_scen3 <- unlist( lapply(1: length(datasets3), function(x) datasets3[[x]]$S_data$B1 ) )
+trunc_slope_scen3 <- unlist( lapply(1: length(datasets3), function(x) datasets3[[x]]$trunc_Sdata$B1 ) )
+scen3_mean_slope <- mean( c(obs_slope_scen3, trunc_slope_scen3 ) )
+
+# Note for dataset 4 there is also an effect of entry_t on Y ltrunc_long_beta = 0.1 * dx_delay
 datasets4 <- readRDS("Data/sim_data4.RDS")
-scen4_mean_int <- mean( unlist( lapply(1: length(datasets4), function(x)
+
+obs_ints_scen4 <- unlist( lapply(1: length(datasets4), function(x)
     datasets4[[x]]$L_data$B0 + ( datasets4[[x]]$L_data$B1 * datasets4[[x]]$L_data$entry_t  ) +
-        0.1 * datasets4[[x]]$L_data$entry_t) ) )
+        0.1 * datasets4[[x]]$L_data$entry_t) )
+trunc_ints_scen4 <- unlist( lapply(1: length(datasets4), function(x)
+    datasets4[[x]]$trunc_Ldata$B0 + ( datasets4[[x]]$trunc_Ldata$B1 * datasets4[[x]]$trunc_Ldata$entry_t  ) +
+        0.1 * datasets4[[x]]$trunc_Ldata$entry_t) )
+scen4_mean_int <- mean( c(obs_ints_scen4, trunc_ints_scen4) )
 rm(datasets4)
 #
 datasets5 <- readRDS("Data/sim_data5.RDS")
-scen5_mean_int <- mean( unlist( lapply(1: length(datasets5), function(x)
-    datasets5[[x]]$L_data$B0 * exp( -datasets5[[x]]$L_data$B1 * datasets5[[x]]$L_data$entry_t  ) ) ) )
+obs_ints_scen5 <- unlist( lapply(1: length(datasets5), function(x)
+    datasets5[[x]]$L_data$B0 + ( datasets5[[x]]$L_data$B1 * datasets5[[x]]$L_data$entry_t  ) ) )
+trunc_ints_scen5 <- unlist( lapply(1: length(datasets5), function(x)
+    datasets5[[x]]$trunc_Ldata$B0 + ( datasets5[[x]]$trunc_Ldata$B1 * datasets5[[x]]$trunc_Ldata$entry_t
+    )))
+scen5_mean_int <- mean( c(obs_ints_scen5, trunc_ints_scen5) )
 rm(datasets5)
-
-# For scenario 3, true values for the longitudinal slopes will be calculated as mean values for b0 and b1 from the raw datasets
-scen3_mean_slope <- mean (unlist( lapply(1: length(datasets3), function(x) datasets3[[x]]$S_data$B1 ) ) )
-rm(datasets3)
-gc()
 
 
 
@@ -236,16 +250,16 @@ gc()
 df1 <- df1 %>% 
     mutate(True_value = case_when(Variable == "Alpha" ~ -0.05,
                                   Variable == "Sub-group Rel. Hazard" ~ log(1.5),
-                                  Variable == "Intercept" & Model %in% c("A", "B", "E") ~ 60,
-                                  Variable == "Intercept" & Model %in% c("C", "D", "F") &
+                                  Variable == "Intercept" & Model %in% c("A", "B") ~ 60,
+                                  Variable == "Intercept" & Model %in% c("C", "D") &
                                       Scenario == 1 ~ scen1_mean_int,
-                                  Variable == "Intercept" & Model %in% c("C", "D", "F") &
+                                  Variable == "Intercept" & Model %in% c("C", "D") &
                                       Scenario == 2 ~ scen2_mean_int,
-                                  Variable == "Intercept" & Model %in% c("C", "D", "F") &
+                                  Variable == "Intercept" & Model %in% c("C", "D") &
                                       Scenario == 3 ~ scen3_mean_int,
-                                  Variable == "Intercept" & Model %in% c("C", "D", "F") &
+                                  Variable == "Intercept" & Model %in% c("C", "D") &
                                       Scenario == 4 ~ scen4_mean_int,
-                                  Variable == "Intercept" & Model %in% c("C", "D", "F") &
+                                  Variable == "Intercept" & Model %in% c("C", "D") &
                                       Scenario == 5 ~ scen5_mean_int,
                                   Variable == "time" & Scenario %in% c(1, 2, 4)~ -1,
                                   Variable == "adj_time" & Scenario %in% c(1, 2, 4)~ -1,
@@ -285,7 +299,7 @@ tab_estimates <- tab_estimates %>%
 
 
 # Reorder columns
-tab_estimates <- select(tab_estimates, Scenario, Variable, Model, True_value,
+tab_estimates <- dplyr::select(tab_estimates, Scenario, Variable, Model, True_value,
                         Mean, MSE, Bias, Bias_pct, Coverage ) %>% 
                         arrange(Scenario, Variable, Model)
 

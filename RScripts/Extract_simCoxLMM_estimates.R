@@ -2,7 +2,7 @@ library(tidyverse)
 library(broom)
 library(parallel)
 library(ggfortify)
-#library(JMTools)
+
 
 #####
 # Define functions to extract parameters 
@@ -24,65 +24,55 @@ coxScen1_modA <- readRDS("Results/Sim_sub-models/coxScen1_modA.RDS")
 coxScen1_modB <- readRDS("Results/Sim_sub-models/coxScen1_modB.RDS")
 coxScen1_modC <- readRDS("Results/Sim_sub-models/coxScen1_modC.RDS")
 coxScen1_modD <- readRDS("Results/Sim_sub-models/coxScen1_modD.RDS")
-#coxScen1_modE <- readRDS("Results/Sim_sub-models/coxScen1_modE.RDS")
 # Extract estimates
 ests_cox_scen1ModA <- extract_simCox_estimates(coxScen1_modA, scenario = 1, model = "A")
 ests_cox_scen1ModB <- extract_simCox_estimates(coxScen1_modB, scenario = 1, model = "B")
 ests_cox_scen1ModC <- extract_simCox_estimates(coxScen1_modC, scenario = 1, model = "C")
 ests_cox_scen1ModD <- extract_simCox_estimates(coxScen1_modD, scenario = 1, model = "D")
-#ests_cox_scen1ModE <- extract_simCox_estimates(coxScen1_modA, scenario = 1, model = "E")
 
 # Load Cox models Scenario 2
 coxScen2_modA <- readRDS("Results/Sim_sub-models/coxScen2_modA.RDS")
 coxScen2_modB <- readRDS("Results/Sim_sub-models/coxScen2_modB.RDS")
 coxScen2_modC <- readRDS("Results/Sim_sub-models/coxScen2_modC.RDS")
 coxScen2_modD <- readRDS("Results/Sim_sub-models/coxScen2_modD.RDS")
-#coxScen2_modE <- readRDS("Results/Sim_sub-models/coxScen2_modE.RDS")
 # Extract estimates
 ests_cox_scen2ModA <- extract_simCox_estimates(coxScen2_modA, scenario = 2, model = "A")
 ests_cox_scen2ModB <- extract_simCox_estimates(coxScen2_modB, scenario = 2, model = "B")
 ests_cox_scen2ModC <- extract_simCox_estimates(coxScen2_modC, scenario = 2, model = "C")
 ests_cox_scen2ModD <- extract_simCox_estimates(coxScen2_modD, scenario = 2, model = "D")
-#ests_cox_scen2ModE <- extract_simCox_estimates(coxScen2_modA, scenario = 2, model = "E")
 
 # Load Cox models Scenario 3
 coxScen3_modA <- readRDS("Results/Sim_sub-models/coxScen3_modA.RDS")
 coxScen3_modB <- readRDS("Results/Sim_sub-models/coxScen3_modB.RDS")
 coxScen3_modC <- readRDS("Results/Sim_sub-models/coxScen3_modC.RDS")
 coxScen3_modD <- readRDS("Results/Sim_sub-models/coxScen3_modD.RDS")
-#coxScen3_modE <- readRDS("Results/Sim_sub-models/coxScen3_modE.RDS")
 # Extract estimates
 ests_cox_scen3ModA <- extract_simCox_estimates(coxScen3_modA, scenario = 3, model = "A")
 ests_cox_scen3ModB <- extract_simCox_estimates(coxScen3_modB, scenario = 3, model = "B")
 ests_cox_scen3ModC <- extract_simCox_estimates(coxScen3_modC, scenario = 3, model = "C")
 ests_cox_scen3ModD <- extract_simCox_estimates(coxScen3_modD, scenario = 3, model = "D")
-#ests_cox_scen3ModE <- extract_simCox_estimates(coxScen3_modA, scenario = 3, model = "E")
 
 # Load Cox models Scenario 4
 coxScen4_modA <- readRDS("Results/Sim_sub-models/coxScen4_modA.RDS")
 coxScen4_modB <- readRDS("Results/Sim_sub-models/coxScen4_modB.RDS")
 coxScen4_modC <- readRDS("Results/Sim_sub-models/coxScen4_modC.RDS")
 coxScen4_modD <- readRDS("Results/Sim_sub-models/coxScen4_modD.RDS")
-#coxScen4_modE <- readRDS("Results/Sim_sub-models/coxScen4_modE.RDS")
 # Extract estimates
 ests_cox_scen4ModA <- extract_simCox_estimates(coxScen4_modA, scenario = 4, model = "A")
 ests_cox_scen4ModB <- extract_simCox_estimates(coxScen4_modB, scenario = 4, model = "B")
 ests_cox_scen4ModC <- extract_simCox_estimates(coxScen4_modC, scenario = 4, model = "C")
 ests_cox_scen4ModD <- extract_simCox_estimates(coxScen4_modD, scenario = 4, model = "D")
-#ests_cox_scen4ModE <- extract_simCox_estimates(coxScen4_modA, scenario = 4, model = "E")
 
 # Load Cox models Scenario 5
 coxScen5_modA <- readRDS("Results/Sim_sub-models/coxScen5_modA.RDS")
 coxScen5_modB <- readRDS("Results/Sim_sub-models/coxScen5_modB.RDS")
 coxScen5_modC <- readRDS("Results/Sim_sub-models/coxScen5_modC.RDS")
 coxScen5_modD <- readRDS("Results/Sim_sub-models/coxScen5_modD.RDS")
-#coxScen5_modE <- readRDS("Results/Sim_sub-models/coxScen5_modE.RDS")
 # Extract estimates
 ests_cox_scen5ModA <- extract_simCox_estimates(coxScen5_modA, scenario = 5, model = "A")
 ests_cox_scen5ModB <- extract_simCox_estimates(coxScen5_modB, scenario = 5, model = "B")
 ests_cox_scen5ModC <- extract_simCox_estimates(coxScen5_modC, scenario = 5, model = "C")
 ests_cox_scen5ModD <- extract_simCox_estimates(coxScen5_modD, scenario = 5, model = "D")
-#ests_cox_scen5ModE <- extract_simCox_estimates(coxScen5_modA, scenario = 5, model = "E")
 
 
 ests_cox_All <- rbind(ests_cox_scen1ModA, ests_cox_scen1ModB, ests_cox_scen1ModC, ests_cox_scen1ModD,
@@ -127,7 +117,7 @@ tab_estimates <- tab_estimates %>%
     mutate(Bias_pct = Bias * 100 / True_value)
 
 # Reorder columns and rows
-tab_estimates <- select(tab_estimates, term, Scenario, Model, True_value,
+tab_estimates <- dplyr::select(tab_estimates, term, Scenario, Model, True_value,
                         Mean, MSE, Bias, Bias_pct, Coverage ) %>% 
                         arrange(Scenario, term, Model)
 
@@ -200,19 +190,86 @@ ests_LMM_All$term <- ifelse( ests_LMM_All$term == "(Intercept)", "Intercept",
                          ifelse( ests_LMM_All$term %in% c("time", "adj_time"),
                                  "Slope", ests_LMM_All$term))
 
-# For scenario 3, true values for the longitudinal slopes will be calculated as mean values for b0 and b1 from the raw datasets
+
+# For all scenarios, true values for the intercepts on the adjusted timeline (i.e. t_adj = 0 at time of diagnosis) can be calculated from the individualised b0, b1 and delayed entry times.
+
+datasets1 <- readRDS("Data/sim_data1.RDS")
+obs_ints_scen1 <- unlist( lapply(1: length(datasets1), function(x)
+    datasets1[[x]]$L_data$B0 + ( datasets1[[x]]$L_data$B1 * datasets1[[x]]$L_data$entry_t  ) ) )
+trunc_ints_scen1 <- unlist( lapply(1: length(datasets1), function(x)
+    datasets1[[x]]$trunc_Ldata$B0 + ( datasets1[[x]]$trunc_Ldata$B1 * datasets1[[x]]$trunc_Ldata$entry_t
+    )))
+scen1_mean_int <- mean( c(obs_ints_scen1, trunc_ints_scen1) )
+rm(datasets1)
+#
+datasets2 <- readRDS("Data/sim_data2.RDS")
+obs_ints_scen2 <- unlist( lapply(1: length(datasets2), function(x)
+    datasets2[[x]]$L_data$B0 + ( datasets2[[x]]$L_data$B1 * datasets2[[x]]$L_data$entry_t  ) ) )
+trunc_ints_scen2 <- unlist( lapply(1: length(datasets2), function(x)
+    datasets2[[x]]$trunc_Ldata$B0 + ( datasets2[[x]]$trunc_Ldata$B1 * datasets2[[x]]$trunc_Ldata$entry_t
+    )))
+scen2_mean_int <- mean( c(obs_ints_scen2, trunc_ints_scen2) )
+rm(datasets2)
+
+# Note for dataset 3 must also calculate mean slope
 datasets3 <- readRDS("Data/sim_data3.RDS")
-scen3_mean_slope = mean (unlist( lapply(1: length(datasets3), function(x) datasets3[[x]]$S_data$B1 ) ) )
-rm(datasets3)
-gc()
+obs_ints_scen3 <- unlist( lapply(1: length(datasets3), function(x)
+    datasets3[[x]]$L_data$B0 + ( datasets3[[x]]$L_data$B1 * datasets3[[x]]$L_data$entry_t  ) ) )
+trunc_ints_scen3 <- unlist( lapply(1: length(datasets3), function(x)
+    datasets3[[x]]$trunc_Ldata$B0 + ( datasets3[[x]]$trunc_Ldata$B1 * datasets3[[x]]$trunc_Ldata$entry_t
+    )))
+scen3_mean_int <- mean( c(obs_ints_scen3, trunc_ints_scen3) )
+#
+obs_slope_scen3 <- unlist( lapply(1: length(datasets3), function(x) datasets3[[x]]$S_data$B1 ) )
+trunc_slope_scen3 <- unlist( lapply(1: length(datasets3), function(x) datasets3[[x]]$trunc_Sdata$B1 ) )
+scen3_mean_slope <- mean( c(obs_slope_scen3, trunc_slope_scen3 ) )
+
+# Note for dataset 4 there is also an effect of entry_t on Y ltrunc_long_beta = 0.1 * dx_delay
+datasets4 <- readRDS("Data/sim_data4.RDS")
+
+obs_ints_scen4 <- unlist( lapply(1: length(datasets4), function(x)
+    datasets4[[x]]$L_data$B0 + ( datasets4[[x]]$L_data$B1 * datasets4[[x]]$L_data$entry_t  ) +
+        0.1 * datasets4[[x]]$L_data$entry_t) )
+trunc_ints_scen4 <- unlist( lapply(1: length(datasets4), function(x)
+    datasets4[[x]]$trunc_Ldata$B0 + ( datasets4[[x]]$trunc_Ldata$B1 * datasets4[[x]]$trunc_Ldata$entry_t  ) +
+        0.1 * datasets4[[x]]$trunc_Ldata$entry_t) )
+scen4_mean_int <- mean( c(obs_ints_scen4, trunc_ints_scen4) )
+rm(datasets4)
+#
+datasets5 <- readRDS("Data/sim_data5.RDS")
+obs_ints_scen5 <- unlist( lapply(1: length(datasets5), function(x)
+    datasets5[[x]]$L_data$B0 + ( datasets5[[x]]$L_data$B1 * datasets5[[x]]$L_data$entry_t  ) ) )
+trunc_ints_scen5 <- unlist( lapply(1: length(datasets5), function(x)
+    datasets5[[x]]$trunc_Ldata$B0 + ( datasets5[[x]]$trunc_Ldata$B1 * datasets5[[x]]$trunc_Ldata$entry_t
+    )))
+scen5_mean_int <- mean( c(obs_ints_scen5, trunc_ints_scen5) )
+rm(datasets5)
+
+
 
 
 # Assign true values to df1 for later coverage and MSE calculations
+#dfresLMM <- ests_LMM_All %>% 
+#    mutate(True_value = case_when(term == "Intercept" ~ 60,
+#                                  term =="Slope" & Scenario %in% c(1, 2, 4) ~ -1,
+#                                  term =="Slope" & Scenario %in% c(3) ~ scen3_mean_slope
+#    ))
+# Assign true values to df1 for later coverage and MSE calculations
 dfresLMM <- ests_LMM_All %>% 
-    mutate(True_value = case_when(term == "Intercept" ~ 60,
-                                  term =="Slope" & Scenario %in% c(1, 2, 4) ~ -1,
-                                  term =="Slope" & Scenario %in% c(3) ~ scen3_mean_slope
-    ))
+    mutate(True_value = case_when(term == "Intercept" & Model == "time" ~ 60,
+                                  term == "Intercept" & Model == "adjtime" &
+                                      Scenario == 1 ~ scen1_mean_int,
+                                  term == "Intercept" & Model =="adjtime" &
+                                      Scenario == 2 ~ scen2_mean_int,
+                                  term == "Intercept" & Model == "adjtime" &
+                                      Scenario == 3 ~ scen3_mean_int,
+                                  term == "Intercept" & Model == "adjtime" &
+                                      Scenario == 4 ~ scen4_mean_int,
+                                  term == "Intercept" & Model == "adjtime" &
+                                      Scenario == 5 ~ scen5_mean_int,
+                                  term == "Slope" & Scenario %in% c(1, 2, 4)~ -1,
+                                  term == "Slope" & Scenario ==3 ~ scen3_mean_slope))
+
 
 # Calculate squared error between each estimate and truth for later MSE calculation
 dfresLMM $sqr_err <- (dfresLMM$True_value - dfresLMM$estimate) ^ 2
@@ -234,7 +291,7 @@ tab_LMMests <- tab_LMMests %>%
     mutate(Bias_pct = Bias * 100 / True_value)
 
 # Reorder columns and rows
-tab_LMMests <- select(tab_LMMests, Scenario, term, Model, True_value,
+tab_LMMests <- dplyr::select(tab_LMMests, Scenario, term, Model, True_value,
                         Mean, MSE, Bias, Bias_pct) %>% 
     arrange(Scenario, Model, term)
 
