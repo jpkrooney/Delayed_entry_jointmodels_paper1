@@ -20,7 +20,6 @@ library(patchwork)
 # Load data
 df_ind <- read.csv("Data/casedata.csv", stringsAsFactors = FALSE)
 df_long <- read.csv("Data/longdata.csv", stringsAsFactors = FALSE)
-#df_snip <- read.csv("Data/snipdata.csv", stringsAsFactors = FALSE)
 
 
 # Set theme for graphs
@@ -51,22 +50,14 @@ theme.apply_noleg <- theme(panel.background = element_rect(fill = 'white'),
 df_ind$simp_site <- factor(df_ind$simp_site, levels = c("Spinal", "Bulbar"))
 df_long$simp_site <- factor(df_long$simp_site, levels = c("Spinal", "Bulbar"))
 df_long$ID <- as.factor(df_long$ID)
-#df_snip$simp_site <- factor(df_snip$simp_site, levels = c("Spinal", "Bulbar"))
-#df_snip$ID <- as.factor(df_snip$ID)
-df_ind$C9 <- factor(df_ind$C9, levels = c("Normal", "Expanded"))
-df_long$C9 <- factor(df_long$C9, levels = c("Normal", "Expanded"))
-#df_snip$C9 <- factor(df_snip$C9, levels = c("Normal", "Expanded"))
-
 
 # 2. Add small value to survival time to avoid possible joint model errors
 df_ind$censor_time <- df_ind$censor_time + 0.0001
 df_long$censor_time <- df_long$censor_time + 0.0001
-#df_snip$censor_time <- df_snip$censor_time + 0.0001
 
 # 3. Ensure data sets are ordered by ID then time for use in joint models
 df_ind <- df_ind[order(df_ind$ID), ]
 df_long <- df_long[order(df_long$ID, df_long$alsfrs_t_mnths), ]
-#df_snip <- df_snip[order(df_snip$ID, df_snip$time_in_months), ]
 
 
 # 4. Count number of longitudinal variables per individual
@@ -80,8 +71,6 @@ df_ind$countlong <- countlong[ match(df_ind$ID, countlong$ID), ]$V1
 df_ind$adj_censortime <- df_ind$censor_time - df_ind$dx_delay
 df_long$adj_censortime <- df_long$censor_time - df_long$dx_delay
 df_long$adj_time <- df_long$alsfrs_t_mnths - df_long$dx_delay
-#df_snip$adj_censortime <- df_snip$censor_time - df_snip$dx_delay
-#df_snip$adj_time <- df_snip$time_in_months - df_snip$dx_delay
 
 # 6. Calculate time of first ALSFRS from diagnosis
 df_ind$first_from_dx <- df_ind$First_alsfrs_t_mnths - df_ind$dx_delay
@@ -93,9 +82,9 @@ df_ind$first_from_dx <- df_ind$First_alsfrs_t_mnths - df_ind$dx_delay
 ### Table 1. Demographics of study patients by diagnosis
 ```{r descriptives}
 ##### Descriptive Statistics
-vars <- c("age", "dx_delay", "simp_site", "C9", "censor_time", "countlong",
+vars <- c("age", "dx_delay", "simp_site", "censor_time", "countlong",
           "First_alsfrs_t_mnths", "first_from_dx", "First_ALSFRS_Total")
-factorVars <- c("simp_site", "C9")
+factorVars <- c("simp_site")
 tab1 <- CreateTableOne(vars = vars, factorVars = factorVars, data=df_ind,
                        test = TRUE, includeNA = TRUE)
 tab1.export <- print(tab1, quote = FALSE, noSpaces = TRUE,
@@ -129,11 +118,11 @@ Note the for models E and F splines terms with 2 d.f. were used instead of polyn
 # Specify Cox models
 cox_modA <- coxph (Surv (censor_time, censor) ~ simp_site + dx_delay,
                             data = df_ind, x = TRUE, model = TRUE)
-cox_modB_E <- coxph (Surv (dx_delay, censor_time, censor) ~ simp_site + dx_delay,
+cox_modB <- coxph (Surv (dx_delay, censor_time, censor) ~ simp_site + dx_delay,
                                  data = df_ind, x = TRUE, model = TRUE)
 cox_modC <- coxph (Surv (adj_censortime, censor) ~ simp_site,
                                  data = df_ind, x = TRUE, model = TRUE)
-cox_modD_F <- coxph (Surv (adj_censortime, censor) ~ simp_site + dx_delay,
+cox_modD <- coxph (Surv (adj_censortime, censor) ~ simp_site + dx_delay,
                                  data = df_ind, x = TRUE, model = TRUE)
     
 # Specify longitudinal model
@@ -143,20 +132,12 @@ lme_modA_B <- lme(Total.score ~ alsfrs_t_mnths,
 lme_modC_D <- lme(Total.score ~ adj_time,
                          random = ~ adj_time | ID, data = df_long,
                          control = lmeControl(opt = "optim")) 
-lme_modE <- lme(Total.score ~ ns(alsfrs_t_mnths, 3),
-                         random = ~ ns(alsfrs_t_mnths, 3) | ID, data = df_long,
-                         control = lmeControl(opt = "optim"))
-lme_modF <- lme(Total.score ~ ns(adj_time, 3),
-                         random = ~ ns(adj_time, 3) | ID, data = df_long,
-                         control = lmeControl(opt = "optim")) 
 
 # Specify joint models
 JM_A <- jointModelBayes(lme_modA_B, cox_modA, timeVar = "alsfrs_t_mnths")
-JM_B <- jointModelBayes(lme_modA_B, cox_modB_E, timeVar = "alsfrs_t_mnths")
+JM_B <- jointModelBayes(lme_modA_B, cox_modB, timeVar = "alsfrs_t_mnths")
 JM_C <- jointModelBayes(lme_modC_D, cox_modC, timeVar = "adj_time")
-JM_D <- jointModelBayes(lme_modC_D, cox_modD_F, timeVar = "adj_time")
-JM_E <- jointModelBayes(lme_modE, cox_modB_E, timeVar = "alsfrs_t_mnths")
-JM_F <- jointModelBayes(lme_modF, cox_modD_F, timeVar = "adj_time")
+JM_D <- jointModelBayes(lme_modC_D, cox_modD, timeVar = "adj_time")
 
 ```
 ### Summary of Cox model hazard ratios
@@ -164,15 +145,15 @@ JM_F <- jointModelBayes(lme_modF, cox_modD_F, timeVar = "adj_time")
 res_cox <- rbind( data.frame( Model = "A",
                        Parameter = tidy(cox_modA)$estimate,
                        tidy(cox_modA, exponentiate = TRUE) ),
-                  data.frame( Model = "B & E",
-                       Parameter = tidy(cox_modB_E)$estimate,
-                       tidy(cox_modB_E, exponentiate = TRUE) ),
+                  data.frame( Model = "B",
+                       Parameter = tidy(cox_modB)$estimate,
+                       tidy(cox_modB, exponentiate = TRUE) ),
                   data.frame( Model = "C",
                        Parameter = tidy(cox_modC)$estimate,
                        tidy(cox_modC, exponentiate = TRUE) ),
-                  data.frame( Model = "D & F",
-                       Parameter = tidy(cox_modD_F)$estimate,
-                       tidy(cox_modD_F, exponentiate = TRUE) ) )
+                  data.frame( Model = "D",
+                       Parameter = tidy(cox_modD)$estimate,
+                       tidy(cox_modD, exponentiate = TRUE) ) )
 res_cox <- res_cox %>% rename(  "Variable" = "term",
                                 "HazRatio" = "estimate",
                                "CI_2.5" = "conf.low",
@@ -191,8 +172,7 @@ summ_JM_A <- summary(JM_A)
 summ_JM_B <- summary(JM_B)
 summ_JM_C <- summary(JM_C)
 summ_JM_D <- summary(JM_D)
-summ_JM_E <- summary(JM_E)
-summ_JM_F <- summary(JM_F)
+
 
 # Extract survival coefficients
 event_coeffs <- rbind( data.frame(Model = "A", 
@@ -203,16 +183,12 @@ event_coeffs <- rbind( data.frame(Model = "A",
        data.frame(Model = "C", Variable = row.names(summ_JM_C$`CoefTable-Event`),
                   summ_JM_C$`CoefTable-Event`),
        data.frame(Model = "D", Variable = row.names(summ_JM_D$`CoefTable-Event`),
-                  summ_JM_D$`CoefTable-Event`),
-       data.frame(Model = "E", Variable = row.names(summ_JM_E$`CoefTable-Event`),
-                  summ_JM_E$`CoefTable-Event`),
-       data.frame(Model = "F", Variable = row.names(summ_JM_F$`CoefTable-Event`),
-                  summ_JM_F$`CoefTable-Event`))
+                  summ_JM_D$`CoefTable-Event`))
 row.names(event_coeffs) <- NULL
 
 # Drop Std Err and Std dev and convert value and CIs to exponential and arrange by variable first
 event_coeffs <- event_coeffs %>%
-  dplyr::select(-Std.Err, -Std.Dev) %>% 
+  dplyr::select(-Std.Dev) %>% 
   mutate(HazRatio = exp(Value),
          CI_2.5 = exp(X2.5.),
          CI_97.5 = exp(X97.5.)) %>% 
@@ -220,7 +196,7 @@ event_coeffs <- event_coeffs %>%
   filter(Variable != "tauBs") %>% 
   arrange(Variable, Model)
 
-kable(event_coeffs %>% dplyr::select(Variable, Model, Parameter, HazRatio, CI_2.5, CI_97.5, P), digits=3)
+kable(event_coeffs %>% dplyr::select(Variable, Model, Parameter, Std.Err, HazRatio, CI_2.5, CI_97.5, P), digits=3)
 
 ```
 
@@ -236,68 +212,21 @@ event_coeffs_long <- rbind( data.frame(Model = "A",
        data.frame(Model = "C", Variable = row.names(summ_JM_C$`CoefTable-Long`),
                   summ_JM_C$`CoefTable-Long`),
        data.frame(Model = "D", Variable = row.names(summ_JM_D$`CoefTable-Long`),
-                  summ_JM_D$`CoefTable-Long`),
-       data.frame(Model = "E", Variable = row.names(summ_JM_E$`CoefTable-Long`),
-                  summ_JM_E$`CoefTable-Long`),
-       data.frame(Model = "F", Variable = row.names(summ_JM_F$`CoefTable-Long`),
-                  summ_JM_F$`CoefTable-Long`))
+                  summ_JM_D$`CoefTable-Long`))
 row.names(event_coeffs_long) <- NULL
 
 # Drop Std Err and Std dev and convert value and CIs to exponential and arrange by variable first
 event_coeffs_long <- event_coeffs_long %>%
-  dplyr::select(-Std.Err, -Std.Dev) %>% 
+  dplyr::select(-Std.Dev) %>% 
   rename( "Parameter" = "Value",
           "CI_2.5" = "X2.5.",
           "CI_97.5" = "X97.5.") %>%
   arrange(Variable, Model)
 
-kable(event_coeffs_long %>% dplyr::select(Variable, Model, Parameter, CI_2.5, CI_97.5, P), digits=3)
+kable(event_coeffs_long %>% dplyr::select(Variable, Model, Parameter, Std.Err, CI_2.5, CI_97.5, P), digits=3)
 
 ```
 
-
-### Marginal effect plots of longtiudinal submodels for models E and F
-
-``` {r marg_plots, echo= FALSE}
-
-newdf <- df_long
-newdf <- predict(JM_E, newdata=newdf, interval="confidence", returnData = TRUE)
-newdf$se.fit <- NULL
-names(newdf)[ (ncol(newdf)-2): ncol(newdf)] <- c("JM_Epred", "JM_Epred_lo", "JM_Epred_hi")
-
-g_JM_E <- ggplot(newdf, aes(x=alsfrs_t_mnths, y = JM_Epred)) +
-    geom_line() + geom_line(aes(y = Total.score, group=ID), size=0.1) +
-    geom_ribbon(aes(ymin = JM_Epred_lo, ymax = JM_Epred_hi, linetype=NA), 
-                alpha=0.15) +
-    theme.apply + coord_cartesian(xlim=c(0, 72), ylim=c(0, 48)) +
-    scale_x_continuous(breaks = c(0, 12, 24, 36, 48, 60, 72)) + 
-    labs(x="\nTime from onset (months)", y="Score\n") +
-    ggtitle(label = "Model E ")
-
-
-newdf <- predict(JM_F, newdata=newdf, interval="confidence", returnData = TRUE)
-newdf$se.fit <- NULL
-names(newdf)[ (ncol(newdf)-2): ncol(newdf)] <- c("JM_Fpred", "JM_Fpred_lo", "JM_Fpred_hi")
-
-g_JM_F <- ggplot(newdf, aes(x=adj_time, y = JM_Fpred)) +
-    geom_line() + geom_line(aes(y = Total.score, group=ID), size=0.1) +
-    geom_ribbon(aes(ymin = JM_Fpred_lo, ymax = JM_Fpred_hi, linetype=NA), 
-                alpha=0.15) +
-    theme.apply + coord_cartesian(xlim=c(0, 72), ylim=c(0, 48)) +
-    scale_x_continuous(breaks = c(0, 12, 24, 36, 48, 60, 72)) + 
-    labs(x="\nAdjusted Time (months)", y="Score\n") +
-    ggtitle(label = "Model F ")
-# print plot
-print(g_JM_E + g_JM_F + plot_layout(nrow = 1))
-# also save to file
-tiff("Results/Graphs/cohort_ME_longfit.tiff", width=1000, height=700, res=108)
-    print(g_JM_E + g_JM_F + plot_layout(nrow = 1))
-dev.off()
-
-
-
-
-```
 
 
 
